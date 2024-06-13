@@ -31,12 +31,17 @@ export async function fetchNercha(): Promise<Nercha[]> {
 }
 
 export async function fetchNerchaById(id: string): Promise<Nercha | undefined> {
-  console.log(id);
-
   const nerchaListRef = doc(db, 'nercha_list', id);
   const nerchaDocSnap = await getDoc(nerchaListRef);
+
   if (nerchaDocSnap.exists()) {
-    nerchaDocSnap.data();
+    return {
+      id: nerchaDocSnap.id,
+      active: nerchaDocSnap.data().active, // Access specific properties
+      created_at: nerchaDocSnap.data().created_at,
+      nercha_date: nerchaDocSnap.data().nercha_date,
+      nercha_name: nerchaDocSnap.data().nercha_name,
+    };
   }
   return undefined;
 }

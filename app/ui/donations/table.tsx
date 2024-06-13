@@ -5,9 +5,7 @@ import { formatDateToLocal, formatCurrency, formatTimeStampDate } from '@/app/li
 import { fetchNerchaDonationsById } from '@/app/lib/data';
 
 export default async function DonationsTable({id}:{id:string}) {
-  //const invoices = await fetchFilteredInvoices(query, currentPage);
-  console.log(`id from ${id}`);
-  
+  //const invoices = await fetchFilteredInvoices(query, currentPage);  
   const donations = await fetchNerchaDonationsById(id);
 
   return (

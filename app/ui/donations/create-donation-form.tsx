@@ -1,17 +1,21 @@
-import { CustomerField } from '@/app/lib/definitions';
+'use client'
 import Link from 'next/link';
 import {
   CheckIcon,
   ClockIcon,
-  CurrencyDollarIcon,
-  UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Button } from '@/app/ui/button';
+import { useFormState, useFormStatus } from 'react-dom';
+import {createDonation} from '@/app/lib/actions'
 
-export default function NerchaDonationForm() {
-    const clusters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+export default function NerchaDonationForm({nerchaId}:{nerchaId:{id:string}}) {  
+  const initialState = {message:null,errors:{},nerchaId:nerchaId};
+  const [state,dispatch] = useFormState(createDonation,initialState);
+  const clusters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+
+  
   return (
-    <form>
+    <form action={dispatch}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* Donor Name */}
         <div className="mb-4">
@@ -30,6 +34,14 @@ export default function NerchaDonationForm() {
               />
             </div>
           </div>
+          <div id="customer-error" aria-live="polite" aria-atomic="true">
+        {state.errors?.name &&
+          state.errors.name.map((error: string) => (
+            <p className="mt-2 text-sm text-red-500" key={error}>
+              {error}
+            </p>
+          ))}
+      </div>
         </div>
 
         {/* Care of */}
@@ -49,9 +61,16 @@ export default function NerchaDonationForm() {
               />
             </div>
           </div>
+          <div id="customer-error" aria-live="polite" aria-atomic="true">
+        {state.errors?.care_of &&
+          state.errors.care_of.map((error: string) => (
+            <p className="mt-2 text-sm text-red-500" key={error}>
+              {error}
+            </p>
+          ))}
+      </div>
         </div>
         {/* Cluster */}
-         {/* Customer Name */}
     <div className="mb-4">
       <label htmlFor="cluster" className="mb-2 block text-sm font-medium">
         Choose cluster
@@ -74,9 +93,17 @@ export default function NerchaDonationForm() {
           ))}
         </select>
       </div>
+      <div id="customer-error" aria-live="polite" aria-atomic="true">
+        {state.errors?.clusterId &&
+          state.errors.clusterId.map((error: string) => (
+            <p className="mt-2 text-sm text-red-500" key={error}>
+              {error}
+            </p>
+          ))}
+      </div>
       </div>
 
-        {/* Invoice Amount */}
+        {/* Donation Amount */}
         <div className="mb-4">
           <label htmlFor="amount" className="mb-2 block text-sm font-medium">
             Choose an amount
@@ -93,6 +120,14 @@ export default function NerchaDonationForm() {
               />
             </div>
           </div>
+          <div id="customer-error" aria-live="polite" aria-atomic="true">
+        {state.errors?.amount &&
+          state.errors.amount.map((error: string) => (
+            <p className="mt-2 text-sm text-red-500" key={error}>
+              {error}
+            </p>
+          ))}
+      </div>
         </div>
 
         {/* Invoice Status */}
@@ -135,6 +170,14 @@ export default function NerchaDonationForm() {
             </div>
           </div>
         </fieldset>
+        <div id="customer-error" aria-live="polite" aria-atomic="true">
+        {state.errors?.status &&
+          state.errors.status.map((error: string) => (
+            <p className="mt-2 text-sm text-red-500" key={error}>
+              {error}
+            </p>
+          ))}
+      </div>
       </div>
       <div className="mt-6 flex justify-end gap-4">
         <Link
@@ -143,8 +186,17 @@ export default function NerchaDonationForm() {
         >
           Cancel
         </Link>
-        <Button type="submit">Create Invoice</Button>
+        <SubmitButton/>
       </div>
     </form>
   );
+}
+
+function SubmitButton (){
+  const {pending} = useFormStatus(); 
+  return (
+
+    <Button className='' type="submit" disabled={pending}>{pending ? 'Submitting':'Submit'}</Button>
+  )
+
 }
