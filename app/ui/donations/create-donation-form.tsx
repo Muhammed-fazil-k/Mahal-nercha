@@ -68,7 +68,7 @@ export default function NerchaDonationForm() {
             Select a Cluster
           </option>
           {clusters.map((cluster) => (
-            <option value={cluster}>
+            <option key={cluster} value={cluster}>
               {cluster}
             </option>
           ))}

@@ -8,14 +8,20 @@ export type Timestamp = {
   nanoseconds: number;
 };
 
+export type Nercha = {
+  id: string;
+  active: boolean;
+  created_at: Timestamp;
+  nercha_date: Timestamp;
+  nercha_name: string;
+};
+
 export type Donation = {
   id: string;
   name: string;
   care_of: string;
   amount: number;
   donated_at: Timestamp;
-  // In TypeScript, this is called a string union type.
-  // It means that the "status" property can only be one of the two strings: 'pending' or 'paid'.
   status: 'pending' | 'paid';
 };
 

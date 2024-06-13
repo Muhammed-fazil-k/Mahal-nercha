@@ -126,7 +126,7 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
   ];
 };
 
-function convertToUrlFormat(text) {
+function convertToUrlFormat(text: string) {
   // 1. Convert to lowercase
   const lowercaseText = text.toLowerCase();
 
