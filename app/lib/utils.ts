@@ -125,3 +125,17 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
     totalPages,
   ];
 };
+
+function convertToUrlFormat(text) {
+  // 1. Convert to lowercase
+  const lowercaseText = text.toLowerCase();
+
+  // 2. Trim leading and trailing whitespace
+  const trimmedText = lowercaseText.trim();
+
+  // 3. Replace middle spaces with hyphens using regular expression
+  const regex = /\s+/g; // Match one or more whitespace characters
+  const urlFormattedText = trimmedText.replace(regex, '-');
+
+  return urlFormattedText;
+}

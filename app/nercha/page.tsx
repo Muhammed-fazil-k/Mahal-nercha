@@ -13,7 +13,7 @@ export default async function NerchasPage() {
       <div className="mt-4 flex items-center justify-items-start gap-2 md:mt-8">
 
       {nerchas?.map(nercha =>
-        <NerchaCard id={nercha.id} title={nercha.nercha_name}
+        <NerchaCard key={nercha.id} id={nercha.id} title={nercha.nercha_name}
         nerchaDate={nercha.nercha_date}
         active={nercha.active}
         />

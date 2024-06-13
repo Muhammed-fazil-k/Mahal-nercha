@@ -25,6 +25,14 @@ export async function fetchNercha() {
   return nerchaArr;
 }
 
+export async function fetchNerchaById(id: string) {
+  console.log(id);
+
+  const nerchaListRef = doc(db, 'nercha_list', id);
+  const nerchaDocSnap = await getDoc(nerchaListRef);
+  return nerchaDocSnap.data();
+}
+
 export async function fetchNerchaDonationsById(id: string) {
   const nerchaListRef = doc(db, 'nercha_list', id);
 
