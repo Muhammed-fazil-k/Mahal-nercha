@@ -2,6 +2,24 @@
 // It describes the shape of the data, and what data type each property should accept.
 // For simplicity of teaching, we're manually defining these types.
 // However, these types are generated automatically if you're using an ORM such as Prisma.
+
+export type Timestamp = {
+  seconds: number;
+  nanoseconds: number;
+};
+
+export type Donation = {
+  id: string;
+  name: string;
+  care_of: string;
+  amount: number;
+  donated_at: Timestamp;
+  // In TypeScript, this is called a string union type.
+  // It means that the "status" property can only be one of the two strings: 'pending' or 'paid'.
+  status: 'pending' | 'paid';
+};
+
+//
 export type User = {
   id: string;
   name: string;

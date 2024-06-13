@@ -1,21 +1,10 @@
 import React from 'react'
-import { fetchNerchaDonations } from '../lib/data'
-import DonationsTable from '../ui/donations/table';
-import { CreateDonation, CreateInvoice } from '../ui/invoices/buttons';
+import { fetchNerchaDonationsById } from '@/app/lib/data'
+import DonationsTable from '@/app/ui/donations/table';
+import { CreateDonation } from '@/app/ui/invoices/buttons';
 
-const page = async ({
-  searchParams
-}:{
-  searchParams?:{
-    query?:string;
-    page?:string;
-  }
-}) => {
-  //console.log(searchParams);
-  
-  const nerchaDonations = await fetchNerchaDonations();
-  console.log(nerchaDonations);
-  
+
+export default async function NerchaDonationPage({params}:{params:{id:string}})  {
   
   return (
     <div className="w-full">
@@ -27,7 +16,7 @@ const page = async ({
         <CreateDonation />
       </div>
        {/* <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}> */}
-        <DonationsTable/>
+        <DonationsTable id={params.id}/>
       {/* </Suspense> */}
       {/* <div className="mt-5 flex w-full justify-center">
         <Pagination totalPages={totalPages} /> 
@@ -36,4 +25,3 @@ const page = async ({
   )
 }
 
-export default page

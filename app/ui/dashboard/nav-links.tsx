@@ -3,6 +3,7 @@ import {
   UserGroupIcon,
   HomeIcon,
   DocumentDuplicateIcon,
+  BuildingStorefrontIcon,
   BanknotesIcon
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
@@ -15,9 +16,9 @@ import clsx from 'clsx';
 const links = [
   { name: 'Home', href: '/', icon: HomeIcon },
   {
-    name: 'Funds',
-    href: '/funds',
-    icon: BanknotesIcon,
+    name: 'Nercha',
+    href: '/nercha',
+    icon: BuildingStorefrontIcon,
   },
 ];
 

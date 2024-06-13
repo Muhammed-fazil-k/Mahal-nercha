@@ -1,10 +1,68 @@
 import { Revenue } from './definitions';
 
 export const formatCurrency = (amount: number) => {
-  return (amount / 100).toLocaleString('en-US', {
+  return amount.toLocaleString('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'INR',
   });
+};
+
+export const formatTimeStampDate = (timestampObject: {
+  seconds: number;
+  nanoseconds: number;
+}) => {
+  // Extract seconds and nanoseconds
+  const { seconds, nanoseconds } = timestampObject;
+
+  // Calculate milliseconds (considering potential edge cases)
+  const milliseconds = seconds * 1000 + Math.floor(nanoseconds / 1000000); // More accurate calculation
+
+  // Create a Date object from milliseconds
+  const dateObject = new Date(milliseconds);
+  if (isNaN(dateObject.getTime())) {
+    throw new Error(
+      'Invalid timestamp provided. Resulting date is outside valid range.',
+    );
+  }
+
+  // Format the date and time using toLocaleString (customizable)
+  const formattedDateTime = dateObject.toLocaleString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  return formattedDateTime;
+};
+
+export const formatTimeStampTillDate = (timestampObject: {
+  seconds: number;
+  nanoseconds: number;
+}) => {
+  // Extract seconds and nanoseconds
+  const { seconds, nanoseconds } = timestampObject;
+
+  // Calculate milliseconds (considering potential edge cases)
+  const milliseconds = seconds * 1000 + Math.floor(nanoseconds / 1000000); // More accurate calculation
+
+  // Create a Date object from milliseconds
+  const dateObject = new Date(milliseconds);
+  if (isNaN(dateObject.getTime())) {
+    throw new Error(
+      'Invalid timestamp provided. Resulting date is outside valid range.',
+    );
+  }
+
+  // Format the date and time using toLocaleString (customizable)
+  const formattedDateTime = dateObject.toLocaleString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+
+  return formattedDateTime;
 };
 
 export const formatDateToLocal = (
