@@ -9,7 +9,7 @@ import { useFormState, useFormStatus } from 'react-dom';
 import {State, createDonation} from '@/app/lib/actions'
 
 export default function NerchaDonationForm({nerchaId}:{nerchaId:string}) {  
-  const initialState:State = {message:null,errors:{},nerchaId:nerchaId};
+  const initialState:State = {message:null,errors:{},nerchaId:nerchaId || ''};
   const [state,dispatch] = useFormState(createDonation,initialState);
   const clusters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 

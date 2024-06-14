@@ -36,6 +36,11 @@ export type State = {
 };
 
 export async function createDonation(prevState: State, formData: FormData) {
+  const newState = {
+    message: 'Success!',
+    errors: {},
+    nerchaId: prevState.nerchaId,
+  };
   const validateField = CreateDonation.safeParse({
     name: formData.get('name'),
     care_of: formData.get('care_of'),
@@ -67,11 +72,9 @@ export async function createDonation(prevState: State, formData: FormData) {
     console.log('Document written with ID: ', docRef.id);
   } catch (e) {
     console.error('Error adding document: ', e);
-    return {
-      message: 'Database Error: Failed to Create Invoice.',
-    };
   }
   const url = `/nercha/${nerchaId}`;
   revalidatePath(url);
   redirect(url);
+  return newState;
 }
