@@ -1,37 +1,44 @@
-'use client'
+'use client';
 import { UpdateInvoice, DeleteInvoice } from '@/app/ui/invoices/buttons';
 import InvoiceStatus from '@/app/ui/invoices/status';
-import { formatDateToLocal, formatCurrency, formatTimeStampDate } from '@/app/lib/utils';
-import { fetchFirstNerchaDonations, fetchMoreNerchaDonations, } from '@/app/lib/data';
+import {
+  formatDateToLocal,
+  formatCurrency,
+  formatTimeStampDate,
+  formatTimeStampTillDate,
+} from '@/app/lib/utils';
+import {
+  fetchFirstNerchaDonations,
+  fetchMoreNerchaDonations,
+} from '@/app/lib/data';
 import { useEffect, useState } from 'react';
 import { Donation, Timestamp } from '@/app/lib/definitions';
 
-export default function DonationsTable({id}:{id:string;}) {
-  //const invoices = await fetchFilteredInvoices(query, currentPage);  
-  //const { donations, lastDonationDate } = await fetchFirstNerchaDonations(id);
-  //const { donArr, lastDonationDate } = await fetchPaginatedNerchaDonationsById(id,currentPage);
-  const [donations,setDonations] = useState<Donation[]>([]);
-  const [lastKey,setLastKey] = useState<Timestamp>({ seconds: 0, nanoseconds: 0 });
+export default function DonationsTable({ id }: { id: string }) {
+  const [donations, setDonations] = useState<Donation[]>([]);
+  const [lastKey, setLastKey] = useState<Timestamp>({
+    seconds: 0,
+    nanoseconds: 0,
+  });
   const [nextDons_loading, setNextDonsLoading] = useState(false);
 
   console.log(lastKey);
-  
-  useEffect(()=>{
+
+  useEffect(() => {
     fetchFirstNerchaDonations(id)
-      .then(res=>{
-          setDonations(res.donations);
-          setLastKey(res.lastDonationDate)
+      .then((res) => {
+        setDonations(res.donations);
+        setLastKey(res.lastDonationDate);
       })
-      .catch(err=>{
+      .catch((err) => {
         console.log('Couldnt fetch first data');
-        
-      })
-  },[])
-  const fetchMoreDonations = (key:Timestamp) => {
+      });
+  }, []);
+  const fetchMoreDonations = (key: Timestamp) => {
     if (key.seconds != 0) {
       setNextDonsLoading(true);
-      fetchMoreNerchaDonations(id,key)
-      .then((res) => {
+      fetchMoreNerchaDonations(id, key)
+        .then((res) => {
           setLastKey(res.lastDonationDate);
           // add new posts to old posts
           setDonations(donations.concat(res.donations));
@@ -42,37 +49,42 @@ export default function DonationsTable({id}:{id:string;}) {
           setNextDonsLoading(false);
         });
     }
-  }
+  };
 
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
-        <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
+        <div className="rounded-lg p-2 md:pt-0">
           <div className="md:hidden">
             {donations?.map((donation) => (
               <div
                 key={donation.id}
-                className="mb-2 w-full rounded-md bg-white p-4"
+                className="mb-5 w-full rounded-md border-t-2 bg-white p-4 drop-shadow-md"
               >
-                <div className="flex items-center justify-between border-b pb-4">
+                <div className="flex items-center justify-between ">
                   <div>
                     <div className="mb-2 flex items-center">
-                      <p className='text-lg'>{donation.name}</p>
+                      <p className="text-lg font-medium">{donation.name}</p>
                     </div>
-                      <p className='text-sm text-gray-500'>C/O - {donation.care_of}</p>
-                  </div>
-                  <InvoiceStatus status={donation.status} />
-                </div>
-                <div className="flex w-full items-center justify-between pt-4">
-                  <div>
-                    <p className="text-lg font-medium">
-                      {formatCurrency(donation.amount)}
+                    <p className="text-sm text-gray-700">
+                      C/O - {donation.care_of}
                     </p>
-                    <p className='text-sm text-gray-500'>{formatTimeStampDate(donation.donated_at)}</p>
+                    <p className="text-sm text-gray-500">
+                      {formatTimeStampTillDate(donation.donated_at)}
+                    </p>
                   </div>
-                  <div className="flex justify-end gap-2">
-                    <UpdateInvoice id={donation.id} />
-                    <DeleteInvoice id={donation.id} />
+                  <div>
+                    <div className="flex flex-row gap-4 pb-3">
+                      <p className="px-2 text-lg font-medium">
+                        {formatCurrency(donation.amount)}
+                      </p>
+                      <InvoiceStatus status={donation.status} />
+                    </div>
+
+                    <div className="flex justify-end gap-2">
+                      <UpdateInvoice id={donation.id} />
+                      <DeleteInvoice id={donation.id} />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -109,7 +121,6 @@ export default function DonationsTable({id}:{id:string;}) {
                 >
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex items-center gap-3">
-                      
                       <p>{donation.name}</p>
                     </div>
                   </td>
@@ -137,11 +148,13 @@ export default function DonationsTable({id}:{id:string;}) {
           </table>
         </div>
       </div>
-      <div style={{ textAlign: "center" }}>
+      <div style={{ textAlign: 'center' }}>
         {nextDons_loading ? (
           <p>Loading..</p>
         ) : lastKey.seconds != 0 ? (
-          <button onClick={() => fetchMoreDonations(lastKey)}>More Donations</button>
+          <button onClick={() => fetchMoreDonations(lastKey)}>
+            More Donations
+          </button>
         ) : (
           <span>You are up to date!</span>
         )}
