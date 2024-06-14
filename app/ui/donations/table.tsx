@@ -1,12 +1,48 @@
-import Image from 'next/image';
+'use client'
 import { UpdateInvoice, DeleteInvoice } from '@/app/ui/invoices/buttons';
 import InvoiceStatus from '@/app/ui/invoices/status';
 import { formatDateToLocal, formatCurrency, formatTimeStampDate } from '@/app/lib/utils';
-import { fetchNerchaDonationsById } from '@/app/lib/data';
+import { fetchFirstNerchaDonations, fetchMoreNerchaDonations, } from '@/app/lib/data';
+import { useEffect, useState } from 'react';
+import { Donation, Timestamp } from '@/app/lib/definitions';
 
-export default async function DonationsTable({id}:{id:string}) {
+export default function DonationsTable({id}:{id:string;}) {
   //const invoices = await fetchFilteredInvoices(query, currentPage);  
-  const donations = await fetchNerchaDonationsById(id);
+  //const { donations, lastDonationDate } = await fetchFirstNerchaDonations(id);
+  //const { donArr, lastDonationDate } = await fetchPaginatedNerchaDonationsById(id,currentPage);
+  const [donations,setDonations] = useState<Donation[]>([]);
+  const [lastKey,setLastKey] = useState<Timestamp>({ seconds: 0, nanoseconds: 0 });
+  const [nextDons_loading, setNextDonsLoading] = useState(false);
+
+  console.log(lastKey);
+  
+  useEffect(()=>{
+    fetchFirstNerchaDonations(id)
+      .then(res=>{
+          setDonations(res.donations);
+          setLastKey(res.lastDonationDate)
+      })
+      .catch(err=>{
+        console.log('Couldnt fetch first data');
+        
+      })
+  },[])
+  const fetchMoreDonations = (key:Timestamp) => {
+    if (key.seconds != 0) {
+      setNextDonsLoading(true);
+      fetchMoreNerchaDonations(id,key)
+      .then((res) => {
+          setLastKey(res.lastDonationDate);
+          // add new posts to old posts
+          setDonations(donations.concat(res.donations));
+          setNextDonsLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setNextDonsLoading(false);
+        });
+    }
+  }
 
   return (
     <div className="mt-6 flow-root">
@@ -100,6 +136,15 @@ export default async function DonationsTable({id}:{id:string}) {
             </tbody>
           </table>
         </div>
+      </div>
+      <div style={{ textAlign: "center" }}>
+        {nextDons_loading ? (
+          <p>Loading..</p>
+        ) : lastKey.seconds != 0 ? (
+          <button onClick={() => fetchMoreDonations(lastKey)}>More Donations</button>
+        ) : (
+          <span>You are up to date!</span>
+        )}
       </div>
     </div>
   );

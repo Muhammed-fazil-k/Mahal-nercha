@@ -6,10 +6,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { Button } from '@/app/ui/button';
 import { useFormState, useFormStatus } from 'react-dom';
-import {createDonation} from '@/app/lib/actions'
+import {State, createDonation} from '@/app/lib/actions'
 
-export default function NerchaDonationForm({nerchaId}:{nerchaId:{id:string}}) {  
-  const initialState = {message:null,errors:{},nerchaId:nerchaId};
+export default function NerchaDonationForm({nerchaId}:{nerchaId:string}) {  
+  const initialState:State = {message:null,errors:{},nerchaId:nerchaId};
   const [state,dispatch] = useFormState(createDonation,initialState);
   const clusters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 

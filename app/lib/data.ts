@@ -8,11 +8,13 @@ import {
   orderBy,
   query,
   setDoc,
+  startAfter,
   where,
 } from 'firebase/firestore';
 
 import { db } from '@/config/firebase';
-import { Donation, Nercha } from './definitions';
+import { Donation, Nercha, Timestamp } from './definitions';
+import { start } from 'repl';
 
 export async function fetchNercha(): Promise<Nercha[]> {
   let nerchaArr = [];
@@ -45,29 +47,64 @@ export async function fetchNerchaById(id: string): Promise<Nercha | undefined> {
   }
   return undefined;
 }
-
-export async function fetchNerchaDonationsById(
+const ITEMS_PER_PAGE = 3;
+export async function fetchFirstNerchaDonations(
   id: string,
-): Promise<Donation[] | undefined> {
+): Promise<{ donations: Donation[]; lastDonationDate: Timestamp }> {
   const nerchaListRef = doc(db, 'nercha_list', id);
 
-  let donArr = [];
+  let donations = [];
   const nerchaCollectionRef = collection(db, 'nercha_donations');
   const dateQuery = query(
     nerchaCollectionRef,
     where('nercha_name', '==', nerchaListRef),
     orderBy('donated_at', 'desc'),
-    limit(3),
+    limit(ITEMS_PER_PAGE),
   );
   const nerchaQuerySnapShot = await getDocs(dateQuery);
 
-  donArr = nerchaQuerySnapShot.docs.map((doc) => ({
-    id: doc.id,
-    name: doc.data().name,
-    care_of: doc.data().care_of,
-    amount: doc.data().amount,
-    donated_at: doc.data().donated_at,
-    status: doc.data().status,
-  }));
-  return donArr;
+  let lastDonationDate: Timestamp = { seconds: 0, nanoseconds: 0 };
+  donations = nerchaQuerySnapShot.docs.map((doc) => {
+    lastDonationDate = doc.data().donated_at;
+    return {
+      id: doc.id,
+      name: doc.data().name,
+      care_of: doc.data().care_of,
+      amount: doc.data().amount,
+      donated_at: doc.data().donated_at,
+      status: doc.data().status,
+    };
+  });
+  return { donations, lastDonationDate };
+}
+export async function fetchMoreNerchaDonations(
+  id: string,
+  key: Timestamp,
+): Promise<{ donations: Donation[]; lastDonationDate: Timestamp }> {
+  const nerchaListRef = doc(db, 'nercha_list', id);
+
+  let donations = [];
+  const nerchaCollectionRef = collection(db, 'nercha_donations');
+  const dateQuery = query(
+    nerchaCollectionRef,
+    where('nercha_name', '==', nerchaListRef),
+    orderBy('donated_at', 'desc'),
+    startAfter(key),
+    limit(ITEMS_PER_PAGE),
+  );
+  const nerchaQuerySnapShot = await getDocs(dateQuery);
+
+  let lastDonationDate: Timestamp = { seconds: 0, nanoseconds: 0 };
+  donations = nerchaQuerySnapShot.docs.map((doc) => {
+    lastDonationDate = doc.data().donated_at;
+    return {
+      id: doc.id,
+      name: doc.data().name,
+      care_of: doc.data().care_of,
+      amount: doc.data().amount,
+      donated_at: doc.data().donated_at,
+      status: doc.data().status,
+    };
+  });
+  return { donations, lastDonationDate };
 }
