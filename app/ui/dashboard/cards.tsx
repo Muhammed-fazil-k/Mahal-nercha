@@ -1,4 +1,9 @@
 import {
+  fetchDonationCountPerNercha,
+  fetchTotalDonationAmountPerNercha,
+} from '@/app/lib/data';
+import { formatCurrency } from '@/app/lib/utils';
+import {
   BanknotesIcon,
   ClockIcon,
   UserGroupIcon,
@@ -12,19 +17,24 @@ const iconMap = {
   invoices: InboxIcon,
 };
 
-export default async function CardWrapper() {
+export default async function CardWrapper({ id }: { id: string }) {
+  const totalDonationPerNercha = await fetchDonationCountPerNercha(id);
+  const totalDonationAmountPerNercha =
+    await fetchTotalDonationAmountPerNercha(id);
   return (
     <>
       {/* NOTE: comment in this code when you get to this point in the course */}
 
-      {/* <Card title="Collected" value={totalPaidInvoices} type="collected" />
-      <Card title="Pending" value={totalPendingInvoices} type="pending" />
-      <Card title="Total Invoices" value={numberOfInvoices} type="invoices" />
       <Card
-        title="Total Customers"
-        value={numberOfCustomers}
+        title="Collected"
+        value={formatCurrency(totalDonationAmountPerNercha)}
+        type="collected"
+      />
+      <Card
+        title="Total Donations"
+        value={totalDonationPerNercha}
         type="customers"
-      /> */}
+      />
     </>
   );
 }

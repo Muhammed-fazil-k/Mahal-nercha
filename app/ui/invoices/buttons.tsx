@@ -13,10 +13,16 @@ export function CreateDonationButton() {
   );
 }
 
-export function UpdateInvoice({ id }: { id: string }) {
+export function UpdateInvoice({
+  donationId,
+  nerchaId,
+}: {
+  donationId: string;
+  nerchaId: string;
+}) {
   return (
     <Link
-      href="/dashboard/invoices"
+      href={`/nercha/${nerchaId}/edit/${donationId}`}
       className="rounded-md border p-2 hover:bg-gray-100"
     >
       <PencilIcon className="w-5" />

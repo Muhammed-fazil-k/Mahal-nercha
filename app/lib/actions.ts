@@ -1,6 +1,12 @@
 'use server';
 import { db } from '@/config/firebase';
-import { addDoc, collection, doc } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  updateDoc,
+} from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
@@ -22,6 +28,7 @@ const FormSchema = z.object({
 });
 
 const CreateDonation = FormSchema.omit({ id: true, donated_at: true });
+const UpdateDonation = FormSchema.omit({ id: true, donated_at: true });
 
 export type State = {
   nerchaId: string;
@@ -77,4 +84,65 @@ export async function createDonation(prevState: State, formData: FormData) {
   revalidatePath(url);
   redirect(url);
   return newState;
+}
+
+export async function updateDonation(
+  id: string,
+  prevState: State,
+  formData: FormData,
+) {
+  const newState = {
+    message: 'Success!',
+    errors: {},
+    nerchaId: prevState.nerchaId,
+  };
+  const validateField = UpdateDonation.safeParse({
+    name: formData.get('name'),
+    care_of: formData.get('care_of'),
+    clusterId: formData.get('clusterId'),
+    amount: formData.get('amount'),
+    status: formData.get('status'),
+  });
+  if (!validateField.success) {
+    return {
+      errors: validateField.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to update Donation.',
+      nerchaId: prevState.nerchaId,
+    };
+  }
+  const { name, care_of, clusterId, amount, status } = validateField.data;
+  const nerchaId = prevState.nerchaId;
+  const donationRef = doc(db, 'nercha_donations', id);
+
+  try {
+    const updatedData = {
+      name: name,
+      care_of: care_of,
+      status: status,
+      amount: amount,
+      cluster_id: clusterId,
+    };
+    const docRef = await updateDoc(donationRef, updatedData);
+    console.log('Document updated ');
+  } catch (e) {
+    console.error('Error updating document: ', e);
+    return {
+      message: 'Database Error: Failed to Update Invoice.',
+      errors: {},
+      nerchaId: prevState.nerchaId,
+    };
+  }
+  const url = `/nercha/${nerchaId}`;
+  revalidatePath(url);
+  redirect(url);
+  return newState;
+}
+
+export async function deleteDonationById(id: string, nerchaId: string) {
+  const donationRef = doc(db, 'nercha_donations', id);
+  await deleteDoc(donationRef);
+
+  const url = `/nercha/${nerchaId}`;
+  revalidatePath(url);
+  redirect(url);
 }

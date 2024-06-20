@@ -23,6 +23,7 @@ export type Donation = {
   amount: number;
   donated_at: Timestamp;
   status: 'pending' | 'paid';
+  cluster_id: string;
 };
 
 //

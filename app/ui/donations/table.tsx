@@ -13,6 +13,11 @@ import {
 } from '@/app/lib/data';
 import { useEffect, useState } from 'react';
 import { Donation, Timestamp } from '@/app/lib/definitions';
+import { log } from 'console';
+import Link from 'next/link';
+import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { deleteDonationById } from '@/app/lib/actions';
+import { useFormStatus } from 'react-dom';
 
 export default function DonationsTable({ id }: { id: string }) {
   const [donations, setDonations] = useState<Donation[]>([]);
@@ -22,7 +27,7 @@ export default function DonationsTable({ id }: { id: string }) {
   });
   const [nextDons_loading, setNextDonsLoading] = useState(false);
 
-  console.log(lastKey);
+  console.log(id);
 
   useEffect(() => {
     fetchFirstNerchaDonations(id)
@@ -82,8 +87,14 @@ export default function DonationsTable({ id }: { id: string }) {
                     </div>
 
                     <div className="flex justify-end gap-2">
-                      <UpdateInvoice id={donation.id} />
-                      <DeleteInvoice id={donation.id} />
+                      <UpdateDonationButton
+                        donationId={donation.id}
+                        nerchaId={id}
+                      />
+                      {/* <DeleteDonationButton
+                        donationId={donation.id}
+                        nerchaId={id}
+                      /> */}
                     </div>
                   </div>
                 </div>
@@ -138,8 +149,14 @@ export default function DonationsTable({ id }: { id: string }) {
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
-                      <UpdateInvoice id={donation.id} />
-                      <DeleteInvoice id={donation.id} />
+                      <UpdateDonationButton
+                        donationId={donation.id}
+                        nerchaId={id}
+                      />
+                      {/* <DeleteDonationButton
+                        donationId={donation.id}
+                        nerchaId={id}
+                      /> */}
                     </div>
                   </td>
                 </tr>
@@ -160,5 +177,49 @@ export default function DonationsTable({ id }: { id: string }) {
         )}
       </div>
     </div>
+  );
+}
+
+export function UpdateDonationButton({
+  donationId,
+  nerchaId,
+}: {
+  donationId: string;
+  nerchaId: string;
+}) {
+  return (
+    <Link
+      href={`/nercha/${nerchaId}/${donationId}/edit`}
+      className="rounded-md border p-2 hover:bg-gray-100"
+    >
+      <PencilIcon className="w-5" />
+    </Link>
+  );
+}
+
+export function DeleteDonationButton({
+  donationId,
+  nerchaId,
+}: {
+  donationId: string;
+  nerchaId: string;
+}) {
+  const deleteDonationWithId = deleteDonationById.bind(
+    null,
+    donationId,
+    nerchaId,
+  );
+  const { pending } = useFormStatus();
+
+  return (
+    <form action={deleteDonationWithId}>
+      <button
+        className="rounded-md border p-2 hover:bg-gray-100"
+        disabled={pending}
+      >
+        <span className="">{pending ? 'Deleting' : 'Delete'}</span>
+        <TrashIcon className="w-4" />
+      </button>
+    </form>
   );
 }

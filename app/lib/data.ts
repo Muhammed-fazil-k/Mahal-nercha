@@ -2,6 +2,8 @@ import {
   DocumentSnapshot,
   collection,
   doc,
+  getAggregateFromServer,
+  getCountFromServer,
   getDoc,
   getDocs,
   limit,
@@ -9,12 +11,14 @@ import {
   query,
   setDoc,
   startAfter,
+  sum,
   where,
 } from 'firebase/firestore';
 
 import { db } from '@/config/firebase';
 import { Donation, Nercha, Timestamp } from './definitions';
 import { start } from 'repl';
+import cluster from 'cluster';
 
 export async function fetchNercha(): Promise<Nercha[]> {
   let nerchaArr = [];
@@ -47,6 +51,27 @@ export async function fetchNerchaById(id: string): Promise<Nercha | undefined> {
   }
   return undefined;
 }
+
+export async function fetchDonationById(
+  id: string,
+): Promise<Donation | undefined> {
+  const donationRef = doc(db, 'nercha_donations', id);
+  const donationDocSnap = await getDoc(donationRef);
+
+  if (donationDocSnap.exists()) {
+    return {
+      id: donationDocSnap.id,
+      name: donationDocSnap.data().name, // Access specific properties
+      care_of: donationDocSnap.data().care_of,
+      amount: donationDocSnap.data().amount,
+      donated_at: donationDocSnap.data().donated_at,
+      status: donationDocSnap.data().status,
+      cluster_id: donationDocSnap.data().cluster_id,
+    };
+  }
+  return undefined;
+}
+
 const ITEMS_PER_PAGE = 3;
 export async function fetchFirstNerchaDonations(
   id: string,
@@ -73,6 +98,7 @@ export async function fetchFirstNerchaDonations(
       amount: doc.data().amount,
       donated_at: doc.data().donated_at,
       status: doc.data().status,
+      cluster_id: doc.data().cluster_id,
     };
   });
   return { donations, lastDonationDate };
@@ -104,7 +130,29 @@ export async function fetchMoreNerchaDonations(
       amount: doc.data().amount,
       donated_at: doc.data().donated_at,
       status: doc.data().status,
+      cluster_id: doc.data().cluster_id,
     };
   });
   return { donations, lastDonationDate };
+}
+
+//Statitics
+export async function fetchDonationCountPerNercha(id: string) {
+  const nerchaListRef = doc(db, 'nercha_list', id);
+
+  const coll = collection(db, 'nercha_donations');
+  const q = query(coll, where('nercha_name', '==', nerchaListRef));
+  const snapshot = await getCountFromServer(q);
+  return snapshot.data().count;
+}
+
+export async function fetchTotalDonationAmountPerNercha(id: string) {
+  const nerchaListRef = doc(db, 'nercha_list', id);
+
+  const coll = collection(db, 'nercha_donations');
+  const q = query(coll, where('nercha_name', '==', nerchaListRef));
+  const snapshot = await getAggregateFromServer(q, {
+    totalAmount: sum('amount'),
+  });
+  return snapshot.data().totalAmount;
 }
